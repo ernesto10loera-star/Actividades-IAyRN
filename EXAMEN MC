@@ -1,0 +1,71 @@
+# =================================================================
+# PARTE 1: CARGA Y LIMPIEZA (PANDAS Y NUMPY)
+# =================================================================
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# 2. Leer el archivo CSV desde la URL proporcionada
+url = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/mpg.csv"
+df = pd.read_csv(url)
+
+# 3. Imprimir las primeras 5 filas y mostrar los tipos de datos de cada columna
+print("--- PRIMERAS 5 FILAS ---")
+print(df.head())
+
+print("\n--- TIPOS DE DATOS ---")
+print(df.dtypes)
+
+# 4. Identificar valores nulos en horsepower y reemplazar con la mediana
+# Verificamos cuántos nulos hay inicialmente
+nulos_iniciales = df['horsepower'].isnull().sum()
+print(f"\nValores nulos encontrados en 'horsepower': {nulos_iniciales}")
+
+# Calculamos la mediana y reemplazamos
+mediana_hp = df['horsepower'].median()
+df['horsepower'] = df['horsepower'].fillna(mediana_hp)
+
+print(f"Valores nulos después de la limpieza: {df['horsepower'].isnull().sum()}")
+print(f"Se utilizó la mediana: {mediana_hp}")
+
+# 5. Crear nueva columna 'relacion_peso_potencia' (weight / horsepower)
+df['relacion_peso_potencia'] = df['weight'] / df['horsepower']
+
+print("\n--- DATOS CON NUEVA COLUMNA (RELACION PESO/POTENCIA) ---")
+print(df[['name', 'weight', 'horsepower', 'relacion_peso_potencia']].head())
+
+
+# =================================================================
+# PARTE 2: VISUALIZACIÓN DE DATOS (MATPLOTLIB)
+# =================================================================
+
+# 1. Histograma: Distribución de la aceleración
+plt.figure(figsize=(10, 6))
+plt.hist(df['acceleration'], bins=20, color='skyblue', edgecolor='black')
+plt.title('Distribución de la Aceleración de los Vehículos')
+plt.xlabel('Aceleración')
+plt.ylabel('Frecuencia (Cantidad de autos)')
+plt.grid(axis='y', alpha=0.3)
+plt.show()
+
+# 2. Gráfico de Dispersión (Scatter): Displacement vs Horsepower
+plt.figure(figsize=(10, 6))
+plt.scatter(df['displacement'], df['horsepower'], color='coral', alpha=0.6)
+plt.title('Relación entre Desplazamiento del Motor y Caballos de Fuerza')
+plt.xlabel('Desplazamiento (displacement)')
+plt.ylabel('Caballos de Fuerza (horsepower)')
+plt.grid(True, linestyle='--', alpha=0.5)
+plt.show()
+
+# 3. Gráfico de Barras: Promedio de rendimiento (mpg) agrupado por país de origen
+# Agrupamos primero con Pandas
+promedio_mpg_origen = df.groupby('origin')['mpg'].mean()
+
+plt.figure(figsize=(10, 6))
+promedio_mpg_origen.plot(kind='bar', color=['tab:blue', 'tab:orange', 'tab:green'])
+plt.title('Promedio de Rendimiento (MPG) según País de Origen')
+plt.xlabel('País de Origen')
+plt.ylabel('Promedio de Millas por Galón (MPG)')
+plt.xticks(rotation=0) # Mantiene los nombres de los países horizontales
+plt.show()
